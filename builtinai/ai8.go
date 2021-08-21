@@ -2,11 +2,12 @@ package builtinai
 
 import (
 	"fmt"
+	"othello/board"
 )
 
 const (
-	PHASE1DEPTH8 = 10 // 8x8
-	PHASE2DEPTH8 = 20 // 8x8
+	PHASE1DEPTH8 = 8  // 8x8
+	PHASE2DEPTH8 = 16 // 8x8
 )
 
 type AI8 struct {
@@ -31,46 +32,37 @@ type AI8 struct {
 
 	// traversed nodes count
 	nodes int
-
-	// the larger the stronger, level is between 0~4
-	level int
 }
 
-func NewAI8(cl color, lv Level) *AI8 {
+func NewAI8(cl color) *AI8 {
 	ai := AI8{
 		color: cl,
 		// table:    make(map[bboard8]int),
 		opponent: cl.reverse(),
 	}
 
-	ai.level = int(lv)
 	ai.totalValue = 13752
 	ai.size = 8
 
 	return &ai
 }
 
-func (ai *AI8) Move(input string) (string, error) {
-	aibd := newBboard8(input)
+func (ai *AI8) Move(bd board.Board) board.Point {
+	aibd := newBboard8(bd.String())
 	ai.nodes = 0
 
 	ai.setPhase(aibd)
 	ai.setDepth()
 
-	var best node
-	// for depth := 2; depth <= ai.depth; depth += 2 {
-	best = ai.alphaBetaHelper(aibd, ai.depth)
-	// }
+	best := ai.alphaBetaHelper(aibd, ai.depth)
 	ai.printValue(best)
 
 	bestPoint := point{best.loc % ai.size, best.loc / ai.size}
 	if !aibd.putAndCheck(ai.color, best.loc) {
-		return "", fmt.Errorf("cannot put: %v, builtin ai %v", bestPoint, ai.color)
+		panic(fmt.Errorf("cannot put: %v, builtin ai %v", bestPoint, ai.color))
 	}
-	return bestPoint.String(), nil
+	return bestPoint.toBoardPoint()
 }
-
-func (ai AI8) Close() {}
 
 func (ai *AI8) printValue(best node) {
 	if ai.phase == 1 {
@@ -84,8 +76,7 @@ func (ai *AI8) printValue(best node) {
 
 func (ai *AI8) setPhase(bd bboard8) {
 	emptyCount := bd.emptyCount()
-	phase2 := PHASE2DEPTH8 + (ai.level-4)*4 // level
-	if emptyCount > phase2 {
+	if emptyCount > PHASE2DEPTH8 {
 		ai.phase = 1
 	} else {
 		ai.phase = 2
@@ -94,11 +85,7 @@ func (ai *AI8) setPhase(bd bboard8) {
 
 func (ai *AI8) setDepth() {
 	if ai.phase == 1 {
-		ai.depth = PHASE1DEPTH8 + (ai.level-4)*2
-
-		if ai.depth <= 0 {
-			ai.depth = 1
-		}
+		ai.depth = PHASE1DEPTH8
 	} else {
 		ai.depth = MAXINT // until end of game
 	}
