@@ -81,7 +81,7 @@ func (g *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func (g *game) Round() {
-	for !g.over {
+	for ; !g.over; time.Sleep(time.Millisecond * 50) {
 		bd := g.bd.Copy()
 		if g.turn {
 			p := g.player1.Move(bd)

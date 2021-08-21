@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	PHASE1DEPTH8 = 8  // 8x8
+	PHASE1DEPTH8 = 12 // 8x8
 	PHASE2DEPTH8 = 16 // 8x8
 )
 
