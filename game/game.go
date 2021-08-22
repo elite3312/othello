@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	COOLDOWN = 0
+	COOLDOWN = time.Millisecond * 500
 )
 
 type game struct {
@@ -61,6 +61,10 @@ func (g *game) Update() error {
 			g.restart()
 			g.lastClick = time.Now()
 		}
+	} else if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		if len(g.available) == 0 {
+			g.turn = !g.turn
+		}
 	}
 
 	return nil
@@ -81,8 +85,9 @@ func (g *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func (g *game) Round() {
-	for ; !g.over; time.Sleep(time.Millisecond * 50) {
+	for ; !g.over; time.Sleep(time.Millisecond * 10) {
 		bd := g.bd.Copy()
+
 		if g.turn {
 			p := g.player1.Move(bd)
 			if ok := g.bd.PutPoint(board.BLACK, p); !ok {
@@ -90,20 +95,27 @@ func (g *game) Round() {
 			}
 			g.available = g.bd.AllValidPoint(board.WHITE)
 			g.lastMove = p
+			if len(g.available) != 0 {
+				g.turn = !g.turn
+			}
 		} else {
+			start := time.Now()
 			p := g.player2.Move(bd)
+			spent := time.Since(start)
+			if spent < time.Second {
+				time.Sleep(time.Second - spent)
+			}
 			if ok := g.bd.PutPoint(board.WHITE, p); !ok {
 				panic("cannot put")
 			}
 			g.available = g.bd.AllValidPoint(board.BLACK)
 			g.lastMove = p
+			fmt.Printf("spent %v\n", time.Since(start))
+			g.turn = !g.turn
 		}
 		g.over = g.bd.IsOver()
 		if g.over {
 			g.winner = g.bd.Winner()
-		}
-		if len(g.available) != 0 {
-			g.turn = !g.turn
 		}
 	}
 }
