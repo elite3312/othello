@@ -7,7 +7,7 @@ import (
 
 const (
 	PHASE1DEPTH8 = 10 // 8x8
-	PHASE2DEPTH8 = 18 // 8x8
+	PHASE2DEPTH8 = 16 // 8x8
 
 	SIZE8      = 8
 	TOTALVALUE = 13752
