@@ -1,10 +1,16 @@
 module othello
 
-go 1.16
+go 1.17
 
 require (
-	fyne.io/fyne/v2 v2.0.3
-	github.com/hajimehoshi/ebiten/v2 v2.1.4
-	github.com/stretchr/testify v1.6.1 // indirect
-	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
+	github.com/hajimehoshi/ebiten/v2 v2.1.6
+	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
+)
+
+require (
+	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20210727001814-0db043d8d5be // indirect
+	golang.org/x/exp v0.0.0-20190731235908-ec7cb31e5a56 // indirect
+	golang.org/x/mobile v0.0.0-20210902104108-5d9a33257ab5 // indirect
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
 )
