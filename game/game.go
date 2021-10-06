@@ -7,6 +7,7 @@ import (
 	"othello/builtinai"
 	"time"
 
+	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -26,9 +27,6 @@ type game struct {
 	window *gtk.Window
 	bd     board.Board
 	units  [][]*unit
-
-	counterBlack Text
-	counterWhite Text
 
 	passBtn *gtk.ToggleButton
 	com1    computer
@@ -113,7 +111,30 @@ func New(win *gtk.Window, params Parameter, size int) {
 		panic(err)
 	}
 	res.Connect("activate", func() {
-		fmt.Println("clicked")
+		fmt.Println("restart")
+	})
+
+	pla, err := gtk.MenuItemNewWithLabel("玩家設定")
+	if err != nil {
+		panic(err)
+	}
+	pla.Connect("activate", func() {
+		win.SetSensitive(false)
+		defer win.SetSensitive(true)
+		d, err := gtk.DialogNew()
+		if err != nil {
+			panic(err)
+		}
+		d.SetSizeRequest(400, 400)
+
+		b, err := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL, 1)
+
+		r1, err := gtk.RadioButtonNew(glib.WrapSList(uintptr(0)))
+		b.Add(r1)
+
+		d.Add(b)
+
+		d.Run()
 	})
 
 	edit, err := gtk.MenuItemNewWithLabel("編輯棋盤")
@@ -152,6 +173,7 @@ func New(win *gtk.Window, params Parameter, size int) {
 
 	span, err := gtk.MenuNew()
 	span.Append(res)
+	span.Append(pla)
 	span.Append(edit)
 	span.Append(quitMenuItem)
 
@@ -169,25 +191,6 @@ func New(win *gtk.Window, params Parameter, size int) {
 		// g.update(nullPoint)
 	})
 	g.passBtn.SetHExpand(true)
-
-	restart, err := gtk.MenuButtonNew()
-	if err != nil {
-		panic(err)
-	}
-	restart.Connect("clicked", func() {
-		dial, err := gtk.DialogNewWithButtons("confirm", win, gtk.DIALOG_DESTROY_WITH_PARENT, []interface{}{"yes", gtk.RESPONSE_ACCEPT}, []interface{}{"no", gtk.RESPONSE_CANCEL})
-		if err != nil {
-			panic(err)
-		}
-		dial.Activate()
-	})
-	restart.SetHExpand(true)
-
-	editBtn, err := gtk.MenuButtonNew()
-	if err != nil {
-		panic(err)
-	}
-	editBtn.SetHExpand(true)
 
 	// if g.com1 != nil || g.com2 != nil {
 	// 	go g.round()
@@ -294,10 +297,10 @@ func (g *game) update(current board.Point) {
 }
 
 func (g *game) refreshCounter() {
-	blacks := g.bd.CountPieces(board.BLACK)
-	whites := g.bd.CountPieces(board.WHITE)
-	g.counterBlack.Update(fmt.Sprintf("black: %2d", blacks))
-	g.counterWhite.Update(fmt.Sprintf("white: %2d", whites))
+	// blacks := g.bd.CountPieces(board.BLACK)
+	// whites := g.bd.CountPieces(board.WHITE)
+	// g.counterBlack.Update(fmt.Sprintf("black: %2d", blacks))
+	// g.counterWhite.Update(fmt.Sprintf("white: %2d", whites))
 }
 
 func (g *game) gameOver() {
